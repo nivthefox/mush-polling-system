@@ -1,0 +1,129 @@
+## ########################################################################## ##
+## __          __   _ _   _                  _
+## \ \        / /  (_) | | |                | |
+##  \ \  /\  / / __ _| |_| |__    _ __   ___| |_
+##   \ \/  \/ / '__| | __| '_ \  | '_ \ / _ \ __|
+##    \  /\  /| |  | | |_| | | |_| | | |  __/ |_
+##     \/  \/ |_|  |_|\__|_| |_(_)_| |_|\___|\__|
+##
+## @created     25th September 2012
+## @edited      25th September 2012
+## @package     Voting
+##
+## Copyright (C) 2012 Kevin Kragenbrink <kevin@writh.net>
+##
+## Permission is hereby granted, free of charge, to any person obtaining a
+## copy of this software and associated documentation files (the "Software"),
+## to deal in the Software without restriction, including without limitation
+## the rights to use, copy, modify, merge, publish, distribute, sublicense,
+## and/or sell copies of the Software, and to permit persons to whom the
+## Software is furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included in
+## all copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+## DEALINGS IN THE SOFTWARE.
+## ########################################################################## ##
+
+## ################################## ##
+## Starting up
+## ################################## ##
+@set                                    %! = QUIET
+-
+
+## ################################## ##
+## Set up the Object
+## ################################## ##
+think set(%!, VA:[ifelse(isdbref(setr(!, searchng(name=%[Commands%] Votes - Staff), OBJECT)), r(OBJECT), create(%[Commands%] Votes - Staff, 10, T))])
+-
+
+@set                                    %vA = !SAFE
+-
+
+@wipe                                   %vA
+-
+
+@set                                    %vA = SAFE
+-
+
+## ################################## ##
+## Commands
+## ################################## ##
+
+## Syntax:
+##   +poll/create <team1>[ <team2>][ <team3>][...]=<subject>[/<style>]
+##
+## Description:
+##   Creates a new poll for staff to vote on.  Vote options must also be
+##   created for the poll.
+##
+##   Optionally, a polling style can be entered.  The following polling
+##   styles are supported:
+##
+##   Style      Description
+##   ------------------------------------------------------------------------
+##   FPP        First past the post (default)
+##   IRV        Instant runoff vote
+## Example:
+##   +poll/create +werewolf +mage +equip +xp=How should fetish crafting affect experience costs?
+&C.+POLL/CREATE                         %vA = $+poll/create *=*:@include %vF/I.CREATE_POLL;
+-
+
+## Syntax:
+##   +poll/add <poll>=<option>
+##
+## Description:
+##   Allows the creator of a poll to create a new voting option.  Note that
+##   all polls will allow an abstain option by default.
+##
+## Example:
+##   +poll/add 123=Half cost.
+##   +poll/add 123=Full cost.
+##   +poll/add 123=Free.
+&C.+POLL/ADD                            %vA = $+poll/add *=*:@include %vF/I.UPDATE_POLL_OPTIONS;
+-
+
+## Syntax:
+##   +poll/open <poll>[=<days>]
+##
+## Description:
+##   Opens a poll for voting.  By default, polls run for 7 days; however,
+##   shorter or longer polls can be specified.
+##
+## Example:
+##   +poll/open 123
+&C.+POLL/OPEN                           %vA = $+poll/open *:@include %vF/I.UPDATE_POLL_STATUS;
+-
+
+## Syntax:
+##   +poll <poll>
+##
+## Description:
+##   Displays information about a poll, including vote options, run length,
+##   results (if available), and creator.
+##
+## Example:
+##   +poll 123
+&C.+POLL_VIEW                           %vA = $+poll *:@include %vF/I.VIEW_POLL;
+-
+
+## Syntax:
+##   +vote <poll>=<option>[:<priority>]
+##
+## Description:
+##   Votes (or re-votes) on an open poll.  In an instant runoff poll, the
+##   priority of the vote can also be included (1 is the highest priority).
+##
+## Example:
+##   +poll 123=1
+## Example:
+##   +poll 123=2:1
+##   +poll 123=3:2
+##   +poll 123=1:3
+&C.+VOTE                                %vA = $+vote *=*:@include %vF/I.VOTE;
